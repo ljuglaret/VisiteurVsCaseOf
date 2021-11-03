@@ -50,7 +50,7 @@ public interface Visiteur<R>{
 }
 ```
 
-##
+## Définition des opérateurs
 ### Plus
 ``` java
 public class Plus implements Expr{
