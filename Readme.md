@@ -1,8 +1,11 @@
 # Version case of (avec elm)
-L évaluation d une expression arithmetique est recursive,
-donc Plus Moins et Fois operent non pas sur des Float mais sur des Expressions
+L évaluation d une expression arithmetique est recursive, Plus Moins et Fois operent sur des Expressions.   
 
-## Défintion du type expression
+Par exemple "2 + (3*4)" est une expression composée elle même de deux expressions:
+-   2 
+-   3*4
+
+## Définition d'une epression
 ``` elm
 type Expr = Plus     Expr Expr
             | Moins  Expr Expr
@@ -10,6 +13,8 @@ type Expr = Plus     Expr Expr
             | Const  Float
 
 ```
+
+L'exemple précédent s'écrit : Plus( (Const 2) , Fois ( Const(3) , Const (4))) 
 
 
 ## Fonction d'évaluation
@@ -22,14 +27,15 @@ eval  o =
         Fois x y  -> (eval x ) * (eval  y)
         Const x -> x
 ```
-
-
-## Exemple
-(8 + 3) - 5
-``` elm
-z : Float
-z = eval (Moins (Plus (Const 8) (Const 3)) (Const 5))
-```
+Déroulement de l'évaluation :   
+- eval ( Plus (Const 2)  (Fois (Const 3)(Const 4)))
+- Ici X = Const 2, et Y = Fois (Const 3)(Const 4)), Donc :   
+- eval ( Plus (Const 2)  (Fois (Const 3)(Const 4))) -> (eval (Const 2)) + (eval(Fois (Const 3)(Const 4)))
+- On peut remplacer eval(Const 2) par 2, on obtient :   
+- 2 + (eval(Fois (Const 3)(Const 4)))
+Ici X = (Const 3) et Y = (Const 4) Donc :   
+- 2 + (eval (Const 3)) * (eval(Const 4))
+- On peut remplacer eval(Const 3) par 3 et eval(Const 4) par 4 on obtient :   2 + (3*4) = 2 + 12 = 14   
 
 # Version visitor (avec Java)
 
@@ -143,12 +149,10 @@ public class Eval {
     }
 }
 ```
+On viste l'expression : new Plus (new Constante(2) , new Produit(new Constante(3) , new Constante(4)))   
+On obtient successivement :   
+-   (new Constante(2)) + (new Produit(new Constante(3) , new Constante(4)))
+-    2 + ((new Constante(3) * new Constante(4)))
+-   2  + ( 3 * 4)
+-   14
 
-## Un exemple
-(8 + 3) - 4
-
-```java
-Expr e1 = new Moins(new Plus(new Constante(8),new Constante(3)),new Constante(4)));
-Eval eval = new Eval(e1); 
-System.out.println(eval.calcul());
-```
