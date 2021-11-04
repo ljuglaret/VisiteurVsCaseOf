@@ -271,4 +271,3 @@ public class VisiteurCalculString  implements Visiteur<String> {
 }
 ```
 
-Bien sûr le raisonnement est le même pour des matrices ou des vecteurs.
