@@ -1,6 +1,6 @@
 package io.github.ljuglaret.visiteur;
 
-public class Constante implements Expr{
+public class Constante implements ExpressionAVisiter{
     private double valeur;
     
     public Constante (double valeur){

@@ -7,7 +7,7 @@ Par exemple "2 + (3*4)" est une expression composée elle même de deux expressi
 -   2 
 -   3*4
 
-## Définition d'une epression
+## Définition d'une expression
 ``` elm
 type Expr = Plus     Expr Expr
             | Moins  Expr Expr
@@ -51,9 +51,10 @@ public interface Visiteur<R>{
         public R visitPuissance(Puissance puissance);
 }
 ```
-## Interface Expr
+## Interface ExpressionAVisiter
+Elle a une seule méthode : accept . Laquelle prend en entrée un visiteur de type R et retourne une valeur de type R.
 ``` java
-public interface Expr {
+public interface ExpressionAVisiterr {
     public  <R> R accept(Visiteur<R> e1);
 }
 ```
@@ -78,7 +79,7 @@ public class Plus implements Expr{
 }
 ``` 
 
-Les  opérateurs Prod et Moins sont construits de la même manière, c'est la méthode accept qui change
+Les  opérateurs Prod et Moins sont construits de la même manière, c'est la méthode accept qui change.
 ## Moins
 ``` java
 public <R> R accept (Visiteur<R> visiteur ){
@@ -111,40 +112,36 @@ public class Constante implements Expr{
 ```
  
 
-## Classe Eval
+## Classe VisiteurCalculReel
 ```java
-public class Eval {
+public class VisiteurCalculReel implements Visiteur<Double> {
 
-    private Expr expr;
-
-    public Eval(Expr expr){
-        this.expr = expr;
+    public Double  visitConstante(Constante constante){
+        return constante.getValeur();
     }
 
-    public double calcul(){
-        Visiteur<Double> v1 = new Visiteur<Double>(){
-            public Double  visitConstante(Constante constante){
-                return constante.getValeur();
-            }
-            public Double visitProd(Prod prod){
-                Double evalExpr1 =  prod.getExpr1().accept(this);
-                Double evalExpr2 =  prod.getExpr2().accept(this);
-                return evalExpr1 * evalExpr2;
-            }
-            public Double visitMoins(Moins moins){
-                Double evalExpr1 =  moins.getExpr1().accept(this);
-                Double evalExpr2 =  moins.getExpr2().accept(this);
-                return evalExpr1 - evalExpr2;
-            }
-            public Double visitPlus(Plus plus){
-                Double evalExpr1 =  plus.getExpr1().accept(this);
-                Double evalExpr2 =  plus.getExpr2().accept(this);
-                return evalExpr1 + evalExpr2;
-            }
-        }; 
-        return expr.accept(v1);
+    public Double visitProd(Prod prod){
+        Double evalExpr1 =  prod.getExpr1().accept(this);
+        Double evalExpr2 =  prod.getExpr2().accept(this);
+        return evalExpr1 * evalExpr2;
+    }
+    public Double visitMoins(Moins moins){
+        Double evalExpr1 =  moins.getExpr1().accept(this);
+        Double evalExpr2 =  moins.getExpr2().accept(this);
+        return evalExpr1 - evalExpr2;
+    }
+    public Double visitPlus(Plus plus){
+        Double evalExpr1 =  plus.getExpr1().accept(this);
+        Double evalExpr2 =  plus.getExpr2().accept(this);
+        return evalExpr1 + evalExpr2;
+    }
+    public Double visitPuissance(Puissance puissance){
+        Double evalExpr1 =  puissance.getExpr1().accept(this);
+        double n =  puissance.getN();
+        return Math.pow(evalExpr1 , n);
     }
 }
+
 ```
 On viste l'expression : new Plus (new Constante(2) , new Produit(new Constante(3) , new Constante(4)))   
 On obtient successivement :   
@@ -154,11 +151,14 @@ On obtient successivement :
 -   14
 
 # Et si ?
-## Et si on voulait ajouter un opérateur 
+## Et si on voulait ajouter un opérateur?
+![](plusDeVisites.png)
+
 Par exemple comment ajouter les opérateurs cosinus, sinus et tangeante?   
 Dans les deux cas il faut :
 -   les ajouter au type expression
--   définir leur calcul
+-   définir leur calcul   
+
 Donc en elm :
 ``` elm
 type Expr = Plus     Expr Expr
@@ -167,7 +167,8 @@ type Expr = Plus     Expr Expr
             | Const  Float
 
 ```
-devient
+devient   
+
 ``` elm
 type Expr = Plus     Expr Expr
             | Moins  Expr Expr
@@ -230,48 +231,44 @@ Dans calcul :
                 return Math.tan(evalExpr1);
             }
  ```
-## Et si on voulait changer la méthode de calcul
-On pourrait vouloir changer le type l'expression de départ et définir de nouvelles règles de calcul.   
-Par exemple sur les String :
--   Plus(str1,str2)  = str1str2  (concaténation)
--   Moins(str1,str2) .  Si str1 = totato , et str2 = to, alors str1 - str2 = ta
--   Prod(str1,str2) . Si str1 = abc , et str2 = def, alors str1*str2 = adbecf
+## Et si on voulait changer la méthode de calcul?
+![](plusDeVisiteurs.png)
 
-Pour cela il faut ajouter une nouvelle classe : VisiteurOperationString, laquelle implémentera Visiteur.
+On pourrait vouloir visiter la même expression mais changer l'implémentation du visiteur.
+Par exemple 
+-   Plus(d1,d2)     =   "(d1 + d2)"
+-   Moins(d1,d2)    =   "(d1 - d2)"
+-   Prod(d1,d2)     =   "(d1 * d2)"
+
+Pour cela il faut ajouter une nouvelle classe : VisiteurOperationString, laquelle implémentera Visiteur.   
+Il faut uniquement définir les méthodes de l'interface Visiteur : 
 ```java
-public class VisiteurOperationString {
-
-    private Expr expr;
-
-    public VisiteurOperationString(Expr expr){
-        this.expr = expr;
+public class VisiteurCalculString  implements Visiteur<String> {
+  public String  visitConstante(Constante constante){
+        return String.valueOf(constante.getValeur());
     }
 
-    public String calcul(){
-        Visiteur<String> v1 = new Visiteur<String>(){
-            public String  visitConstante(Constante constante){
-                return constante.getValeur();
-            }
-            public String visitProd(Prod prod){
-                String evalExpr1 =  prod.getExpr1().accept(this);
-                String evalExpr2 =  prod.getExpr2().accept(this);
-                return "";//à définir;//
-            }
-            public String visitMoins(Moins moins){
-                String evalExpr1 =  moins.getExpr1().accept(this);
-                String evalExpr2 =  moins.getExpr2().accept(this);
-                return ""; //à definir//
-            }
-            public String visitPlus(Plus plus){
-                String evalExpr1 =  plus.getExpr1().accept(this);
-                String evalExpr2 =  plus.getExpr2().accept(this);
-                return evalExpr1 + evalExpr2;
-            }
-        }; 
-        return expr.accept(v1);
+    public String visitProd(Prod prod){
+        String evalExpr1 =  prod.getExpr1().accept(this);
+        String evalExpr2 =  prod.getExpr2().accept(this);
+        return "(" +  evalExpr1 + "*" + evalExpr2 +")";
+    }
+    public String visitMoins(Moins moins){
+        String evalExpr1 =  moins.getExpr1().accept(this);
+        String evalExpr2 =  moins.getExpr2().accept(this);
+        return "(" +  evalExpr1 + "-" + evalExpr2 +")";
+    }
+    public String visitPlus(Plus plus){
+        String evalExpr1 =  plus.getExpr1().accept(this);
+        String evalExpr2 =  plus.getExpr2().accept(this);
+        return "(" +  evalExpr1 + "+" + evalExpr2 +")";
+    }
+    public String visitPuissance(Puissance puissance){
+        String evalExpr1 =  puissance.getExpr1().accept(this);
+        double n =  puissance.getN();
+        return "(" +  evalExpr1 + "^" + n +")";
     }
 }
-
 ```
 
 Bien sûr le raisonnement est le même pour des matrices ou des vecteurs.

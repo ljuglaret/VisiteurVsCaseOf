@@ -1,12 +1,12 @@
 package io.github.ljuglaret.visiteur;
 
-public class Prod implements Expr{
+public class Prod implements ExpressionAVisiter{
 
-    private Expr expr1;
-    private Expr expr2;
+    private ExpressionAVisiter expr1;
+    private ExpressionAVisiter expr2;
     
 
-    public Prod(Expr expr1 , Expr expr2){
+    public Prod(ExpressionAVisiter expr1 , ExpressionAVisiter expr2){
         this.expr1 = expr1;
         this.expr2 = expr2;
     }
@@ -16,11 +16,11 @@ public class Prod implements Expr{
         return visiteur.visitProd(this);
     }
     
-    public Expr getExpr1(){
+    public ExpressionAVisiter getExpr1(){
         return expr1;
     }
     
-    public Expr getExpr2(){
+    public ExpressionAVisiter getExpr2(){
         return expr2;
     }
     

@@ -1,12 +1,12 @@
 package io.github.ljuglaret.visiteur;
 
-public class Puissance implements Expr{
+public class Puissance implements ExpressionAVisiter{
 
-    private Expr expr1;
+    private ExpressionAVisiter expr1;
     private double n;
     
 
-    public Puissance(Expr expr1 , double n){
+    public Puissance(ExpressionAVisiter expr1 , double n){
         this.expr1 = expr1;
         this.n = n;
     }
@@ -15,7 +15,7 @@ public class Puissance implements Expr{
         return visiteur.visitPuissance(this);
     }
     
-    public Expr getExpr1(){
+    public ExpressionAVisiter getExpr1(){
         return expr1;
     }
     
