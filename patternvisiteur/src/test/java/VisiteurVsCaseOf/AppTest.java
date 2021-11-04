@@ -14,12 +14,12 @@ class AppTest {
         Expr e4 = new Plus(new Constante(2),new Plus(new Constante(3),new Constante(4)));
 
         //Commutativité : a+b = b+a
-        assertEquals(new Eval(e1).calcul(),new Eval(e2).calcul());
-        assertEquals(5.0, new Eval(e1).calcul());
+        assertEquals(new VisiteurOperation(e1).calcul(),new VisiteurOperation(e2).calcul());
+        assertEquals(5.0, new VisiteurOperation(e1).calcul());
         
         //associativité : (a+b)+c = a+(b+c)
-        assertEquals(new Eval(e3).calcul(),new Eval(e4).calcul());
-        assertEquals(9.0, new Eval(e3).calcul());
+        assertEquals(new VisiteurOperation(e3).calcul(),new VisiteurOperation(e4).calcul());
+        assertEquals(9.0, new VisiteurOperation(e3).calcul());
     }
 
     @Test void testProduit() {
@@ -29,11 +29,11 @@ class AppTest {
         Expr e4 = new Prod(new Constante(2),new Prod(new Constante(3),new Constante(4)));
 
         //Commutativité : a*b = b*a
-        assertEquals(new Eval(e1).calcul(),new Eval(e2).calcul());
-        assertEquals(6.0, new Eval(e1).calcul());
+        assertEquals(new VisiteurOperation(e1).calcul(),new VisiteurOperation(e2).calcul());
+        assertEquals(6.0, new VisiteurOperation(e1).calcul());
         
         //associativité : (a*b)*c = a*(b*c)
-        assertEquals(new Eval(e3).calcul(),new Eval(e4).calcul());
-        assertEquals(24.0, new Eval(e3).calcul());
+        assertEquals(new VisiteurOperation(e3).calcul(),new VisiteurOperation(e4).calcul());
+        assertEquals(24.0, new VisiteurOperation(e3).calcul());
     }
 }

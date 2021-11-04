@@ -1,10 +1,10 @@
 package io.github.ljuglaret.visiteur;
 
-public class Eval {
+public class VisiteurOperation {
 
     private Expr expr;
 
-    public Eval(Expr expr){
+    public VisiteurOperation(Expr expr){
         this.expr = expr;
     }
 
@@ -30,8 +30,8 @@ public class Eval {
             }
             public Double visitPuissance(Puissance puissance){
                 Double evalExpr1 =  puissance.getExpr1().accept(this);
-                Double evalExpr2 =  puissance.getExpr2().accept(this);
-                return Math.pow(evalExpr1 , evalExpr2);
+                double n =  puissance.getN();
+                return Math.pow(evalExpr1 , n);
             }
         }; 
         return expr.accept(v1);

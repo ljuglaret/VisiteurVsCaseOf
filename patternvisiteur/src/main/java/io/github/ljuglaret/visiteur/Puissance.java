@@ -3,12 +3,12 @@ package io.github.ljuglaret.visiteur;
 public class Puissance implements Expr{
 
     private Expr expr1;
-    private Expr expr2;
+    private double n;
     
 
-    public Puissance(Expr expr1 , Expr expr2){
+    public Puissance(Expr expr1 , double n){
         this.expr1 = expr1;
-        this.expr2 = expr2;
+        this.n = n;
     }
 
     public <R> R accept (Visiteur<R> visiteur ){
@@ -19,8 +19,8 @@ public class Puissance implements Expr{
         return expr1;
     }
     
-    public Expr getExpr2(){
-        return expr2;
+    public double getN(){
+        return n;
     }
  
    

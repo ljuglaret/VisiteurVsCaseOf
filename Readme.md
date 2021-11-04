@@ -49,6 +49,12 @@ public interface Visiteur<R>{
         public R visitPuissance(Puissance puissance);
 }
 ```
+## Interface Expr
+``` java
+public interface Expr {
+    public  <R> R accept(Visiteur<R> e1);
+}
+```
 
 ## Définition des opérateurs
 ### Plus
@@ -70,7 +76,7 @@ public class Plus implements Expr{
 }
 ``` 
 
-Les autres opérateurs sont construits de la même manière, c'est la méthode accept qui change
+Les  opérateurs Prod et Moins sont construits de la même manière, c'est la méthode accept qui change
 ## Moins
 ``` java
 public <R> R accept (Visiteur<R> visiteur ){
@@ -82,13 +88,6 @@ public <R> R accept (Visiteur<R> visiteur ){
 ``` java
 public <R> R accept (Visiteur<R> visiteur ){
         return visiteur.visitProd(this);
-    }
-``` 
-
-## Puissance
-``` java
-public <R> R accept (Visiteur<R> visiteur ){
-        return visiteur.visitPuissance(this);
     }
 ``` 
 
@@ -108,6 +107,7 @@ public class Constante implements Expr{
  //à définir : getValeur();
 }
 ```
+ 
 
 ## Classe Eval
 ```java
@@ -139,11 +139,6 @@ public class Eval {
                 Double evalExpr2 =  plus.getExpr2().accept(this);
                 return evalExpr1 + evalExpr2;
             }
-            public Double visitPuissance(Puissance puissance){
-                Double evalExpr1 =  puissance.getExpr1().accept(this);
-                Double evalExpr2 =  puissance.getExpr2().accept(this);
-                return Math.pow(evalExpr1 , evalExpr2);
-            }
         }; 
         return expr.accept(v1);
     }
@@ -156,3 +151,125 @@ On obtient successivement :
 -   2  + ( 3 * 4)
 -   14
 
+# Et si ?
+## Et si on voulait ajouter un opérateur 
+Par exemple comment ajouter les opérateurs cosinus, sinus et tangeante?   
+Dans les deux cas il faut :
+-   les ajouter au type expression
+-   définir leur calcul
+Donc en elm :
+``` elm
+type Expr = Plus     Expr Expr
+            | Moins  Expr Expr
+            | Fois   Expr Expr 
+            | Const  Float
+
+```
+devient
+``` elm
+type Expr = Plus     Expr Expr
+            | Moins  Expr Expr
+            | Fois   Expr Expr 
+            | Const  Expr 
+            | Cos    Expr 
+            | Sin    Expr 
+            | Tan    Expr 
+```
+et trois cas doivent être ajoutés à éval   
+-   Cos x ->    cos(eval x )
+-   Sin x ->    sin(eval x )
+-   Tan x ->    tan(eval x )
+
+En java c'est exactement le même principe.   
+On ajoute trois nouvelles méthodes à l'interface Visiteur   
+``` java
+public interface Visiteur<R>{
+        //.....  
+        public R visitCos(Cosinus cosinus);
+        public R visitSin(Sinus sinus);
+        public R visitTan(Tan tan);
+}
+```
+Avec les trois classes correspondantes   
+``` java
+public class Cosinus implements Expr{
+    private Expr expr1;
+    public Cosinus(Expr expr1){
+        this.expr1 = expr1;
+    }
+    public <R> R accept (Visiteur<R> visiteur ){
+        return visiteur.visitCos(this);
+    }
+ //à définir : getExpr1();
+}
+``` 
+Sinus et Tan sont similaires, seule la fonction accept est modifiée :   
+``` java
+    public <R> R accept (Visiteur<R> visiteur ){
+        return visiteur.visitSin(this);
+    }
+    public <R> R accept (Visiteur<R> visiteur ){
+        return visiteur.visitTan(this);
+    }
+``` 
+Il faut maintenant indiquer comment ces expressions sont évaluées   
+Dans calcul : 
+   ``` java
+   public Double visitCos(Cosinus cosinus){
+                Double evalExpr1 =  cosinus.getExpr1().accept(this);
+                return Math.cos(evalExpr1);
+            }
+    public Double visitSin(Sinus sinus){
+                Double evalExpr1 =  sinus.getExpr1().accept(this);
+                return Math.sin(evalExpr1);
+            }
+    public Double visitTan(Tan tan){
+                Double evalExpr1 =  tan.getExpr1().accept(this);
+                return Math.tan(evalExpr1);
+            }
+ ```
+## Et si on voulait changer la méthode de calcul
+On pourrait vouloir changer le type l'expression de départ et définir de nouvelles règles de calcul.   
+Par exemple sur les String :
+-   Plus(str1,str2)  = str1str2  (concaténation)
+-   Moins(str1,str2) .  Si str1 = totato , et str2 = to, alors str1 - str2 = ta
+-   Prod(str1,str2) . Si str1 = abc , et str2 = def, alors str1*str2 = adbecf
+
+Pour cela il faut ajouter une nouvelle classe : VisiteurOperationString, laquelle implémentera Visiteur.
+```java
+public class VisiteurOperationString {
+
+    private Expr expr;
+
+    public VisiteurOperationString(Expr expr){
+        this.expr = expr;
+    }
+
+    public String calcul(){
+        Visiteur<String> v1 = new Visiteur<String>(){
+            public String  visitConstante(Constante constante){
+                return constante.getValeur();
+            }
+            public String visitProd(Prod prod){
+                String evalExpr1 =  prod.getExpr1().accept(this);
+                String evalExpr2 =  prod.getExpr2().accept(this);
+                return "";//à définir;//
+            }
+            public String visitMoins(Moins moins){
+                String evalExpr1 =  moins.getExpr1().accept(this);
+                String evalExpr2 =  moins.getExpr2().accept(this);
+                return ""; //à definir//
+            }
+            public String visitPlus(Plus plus){
+                String evalExpr1 =  plus.getExpr1().accept(this);
+                String evalExpr2 =  plus.getExpr2().accept(this);
+                return evalExpr1 + evalExpr2;
+            }
+        }; 
+        return expr.accept(v1);
+    }
+}
+
+```
+
+Bien sûr le raisonnement est le même pour des matrices ou des vecteurs.
