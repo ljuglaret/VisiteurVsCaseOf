@@ -1,3 +1,5 @@
+![](visiteurUML.png)
+
 # Version case of (avec elm)
 L évaluation d une expression arithmetique est recursive, Plus Moins et Fois operent sur des Expressions.   
 
